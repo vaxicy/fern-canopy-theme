@@ -11,7 +11,7 @@
 Fern Canopy pairs a forest-green frame with a slightly lighter green toolbar, then opens onto a soft mint New Tab Page. Cream ink keeps every tab, bookmark and toolbar icon crisp against the dark chrome, deep forest ink keeps the pale page readable, and a single-row shortcut layout with a color-matched Google logo keeps the New Tab Page clean.
 
 <p align="center">
-  <img src="store-assets/promo/1400x560.png" alt="Fern Canopy Theme promo" width="700">
+  <img src="store-assets/promo/1400x560.png?v=2" alt="Fern Canopy Theme promo" width="700">
 </p>
 
 ## Design Concept
