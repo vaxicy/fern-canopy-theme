@@ -11,7 +11,7 @@ import os
 import time
 from pathlib import Path
 
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 ROOT = Path(__file__).resolve().parent.parent
 os.chdir(str(ROOT))                      # relative paths only (non-ASCII path safety)
@@ -86,17 +86,37 @@ def compose(size, geom, colors, props):
     cta_bg = rgb(colors["frame"])
     cta_txt = rgb(colors["tab_text"])
 
-    bar_colors = [rgb(colors["ntp_background"]), rgb(colors["button_background_secondary"]),
-                  rgb(colors["button_background"]), rgb(props["ntp_button_background"]),
-                  rgb(colors["toolbar"]), rgb(colors["frame"])]
-    bw, bgap = geom["bar_w"], geom["bar_gap"]
-    bars_w = bw * len(bar_colors) + bgap * (len(bar_colors) - 1)
-    bx, by = RIGHT - bars_w, geom["bar_y"]
-    for i, col in enumerate(bar_colors):
-        x0 = bx + i * (bw + bgap)
-        # no outline: the bars read as flat paint chips (user request 2026-10-16)
-        d.rounded_rectangle([x0, by, x0 + bw, by + geom["bar_h"]], radius=bw // 3, fill=col)
-    assert bx + bars_w <= RIGHT, "palette bars overflow the right margin"
+    # palette tiles: a 3x2 grid of rounded swatches with a soft shadow
+    # (replaces the old vertical paint bars — user request 2026-10-20)
+    tile_colors = [rgb(colors["ntp_background"]), rgb(colors["button_background_secondary"]),
+                   rgb(colors["button_background"]), rgb(props["ntp_button_background"]),
+                   rgb(colors["toolbar"]), rgb(colors["frame"])]
+    cols = 3
+    block_w = geom["block_w"]
+    tgap = block_w * 0.05
+    tw = (block_w - tgap * (cols - 1)) / cols
+    th = tw * geom["tile_ratio"]
+    block_h = th * 2 + tgap
+    bx, by = int(round(RIGHT - block_w)), geom["bar_y"]
+    assert bx + block_w <= RIGHT, "palette tiles overflow the right margin"
+    assert by + block_h <= H - 12, "palette tiles too close to the canvas bottom"
+
+    shadow = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    sd = ImageDraw.Draw(shadow)
+    for i in range(len(tile_colors)):
+        r, c = divmod(i, cols)
+        x0 = bx + c * (tw + tgap)
+        y0 = by + r * (th + tgap)
+        sd.rounded_rectangle([x0, y0 + 6, x0 + tw, y0 + th + 6],
+                             radius=tw * 0.26, fill=(22, 38, 26, 48))
+    shadow = shadow.filter(ImageFilter.GaussianBlur(7))
+    img = Image.alpha_composite(img.convert("RGBA"), shadow).convert("RGB")
+    d = ImageDraw.Draw(img)
+    for i, col in enumerate(tile_colors):
+        r, c = divmod(i, cols)
+        x0 = bx + c * (tw + tgap)
+        y0 = by + r * (th + tgap)
+        d.rounded_rectangle([x0, y0, x0 + tw, y0 + th], radius=tw * 0.26, fill=col)
 
     lsize = geom["logo"]
     logo = Image.open("logo/logo.png").convert("RGBA").resize((lsize, lsize), Image.LANCZOS)
@@ -128,7 +148,7 @@ def compose(size, geom, colors, props):
     assert btn_y + btn_h <= H - 12, "CTA button too close to the canvas bottom"
     assert btn_x + btn_w <= RIGHT, "CTA button overflows the right margin"
     assert btn_x + btn_w <= bx - 20, "CTA button collides with the palette bars"
-    return img, {"btn": (btn_x, btn_y, btn_w, btn_h), "bars": (bx, by, bars_w, geom["bar_h"])}
+    return img, {"btn": (btn_x, btn_y, btn_w, btn_h), "tiles": (bx, by, block_w, round(block_h))}
 
 
 LARGE = {
@@ -140,7 +160,7 @@ LARGE = {
     "chip_size": 15, "chip_h": 34, "chip_gap": 34, "chip_gap_x": 12,
     "cta": "Try It Now", "cta_size": 20, "cta_w": 210, "cta_h": 54,
     "cta_y": 366, "cta_beside": True,
-    "bar_w": 46, "bar_gap": 10, "bar_h": 300, "bar_y": 130,
+    "block_w": 300, "tile_ratio": 1.44, "bar_y": 130,
 }
 
 SMALL = {
@@ -152,7 +172,7 @@ SMALL = {
     "chip_size": 10, "chip_h": 22, "chip_gap": 12, "chip_gap_x": 8,
     "cta": "Try It Now", "cta_size": 13, "cta_w": 118, "cta_h": 36,
     "cta_y": 0, "cta_gap": 16, "cta_beside": False,
-    "bar_w": 16, "bar_gap": 4, "bar_h": 120, "bar_y": 68,
+    "block_w": 132, "tile_ratio": 1.44, "bar_y": 68,
 }
 
 
@@ -166,7 +186,7 @@ def main():
         img, boxes = compose(size, geom, c, p)
         out = "%s/%dx%d.png" % (OUT_DIR, size[0], size[1])
         save_png(img, out)
-        print("saved:", out, img.size, img.mode, "cta:", boxes["btn"], "bars:", boxes["bars"])
+        print("saved:", out, img.size, img.mode, "cta:", boxes["btn"], "tiles:", boxes["tiles"])
 
 
 if __name__ == "__main__":
