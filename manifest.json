@@ -1,0 +1,34 @@
+{
+  "manifest_version": 3,
+  "name": "Fern Canopy Theme",
+  "version": "1.0.0",
+  "description": "A lush green Chrome theme in a single verdant value ladder — pale mint leaves over a deep forest frame.",
+  "icons": {
+    "128": "logo/logo.png"
+  },
+  "theme": {
+    "colors": {
+      "frame":                        [63, 107, 76],
+      "frame_inactive":               [76, 123, 90],
+      "toolbar":                      [71, 114, 79],
+      "tab_text":                     [228, 241, 214],
+      "bookmark_text":                [228, 241, 214],
+      "ntp_background":               [228, 241, 214],
+      "ntp_text":                     [47, 74, 56],
+      "ntp_link":                     [63, 107, 76],
+      "ntp_header":                   [212, 233, 189],
+      "button_background":            [212, 233, 189],
+      "button_background_secondary":  [197, 225, 165],
+      "omnibox_background":           [241, 248, 232],
+      "toolbar_button_icon":          [228, 241, 214]
+    },
+    "properties": {
+      "ntp_button_background":    [144, 164, 121],
+      "ntp_button_hover":         [126, 148, 104],
+      "ntp_logo_alternate":       1,
+      "ntp_single_row_shortcuts": true
+    },
+    "color_scheme": "light",
+    "default_color_scheme": "light"
+  }
+}
