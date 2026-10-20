@@ -107,9 +107,9 @@ def compose(size, geom, colors, props):
         r, c = divmod(i, cols)
         x0 = bx + c * (tw + tgap)
         y0 = by + r * (th + tgap)
-        sd.rounded_rectangle([x0, y0 + 6, x0 + tw, y0 + th + 6],
-                             radius=tw * 0.26, fill=(22, 38, 26, 48))
-    shadow = shadow.filter(ImageFilter.GaussianBlur(7))
+        sd.rounded_rectangle([x0, y0 + 4, x0 + tw, y0 + th + 4],
+                             radius=tw * 0.26, fill=(22, 38, 26, 24))
+    shadow = shadow.filter(ImageFilter.GaussianBlur(6))
     img = Image.alpha_composite(img.convert("RGBA"), shadow).convert("RGB")
     d = ImageDraw.Draw(img)
     for i, col in enumerate(tile_colors):
