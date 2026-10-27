@@ -81,7 +81,6 @@ Upload the resulting `.zip` to the Chrome Web Store developer dashboard.
 | `scripts/generate-screenshot-headless.py` | Regenerate the browser mockup via Playwright |
 | `scripts/generate-screenshot-2-palette.py` | Regenerate the palette screenshot |
 | `scripts/generate-promo.py` | Regenerate both promo tiles |
-| `logo/candidates/` | Candidate previews and light/dark contact sheets |
 | `LICENSE` | Non-Commercial License (English / 中文) |
 
 ## License

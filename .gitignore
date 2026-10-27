@@ -7,3 +7,4 @@ Cached Theme.pak
 *.pak
 __pycache__/
 *.pyc
+logo/candidates/
